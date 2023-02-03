@@ -1,0 +1,1 @@
+1 gptService에 한글 입력하면 utf-8 코덱이 없어 json 변환이 안됨
