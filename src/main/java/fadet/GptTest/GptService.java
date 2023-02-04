@@ -4,15 +4,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class GptService {
-    public String getTransSentence(String s) {
+    public String incoding(String s) {
 
         String clientId = "Bearer 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";//애플리케이션 클라이언트 아이디값";
 

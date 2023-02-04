@@ -10,7 +10,7 @@ import java.util.Map;
 
 @org.springframework.stereotype.Service
 public class PapagoService {
-    public String getTransSentence(String s) {
+    public String incoding(String s) {
 
         String clientId = "Gq8U7FfphGubx99OjBXA";//애플리케이션 클라이언트 아이디값";
         String clientSecret = "02aXTtkjy2";//애플리케이션 클라이언트 시크릿값";
