@@ -1,5 +1,6 @@
 package fadet.GptTest.web;
 
+import fadet.GptTest.ApiService;
 import fadet.GptTest.GptService;
 import fadet.GptTest.PapagoService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ public class Controller {
 
     private final PapagoService pService;
     private final GptService gptService;
+    private final ApiService apiService;
 
     @GetMapping("/service")
     public String home(Model model) {
