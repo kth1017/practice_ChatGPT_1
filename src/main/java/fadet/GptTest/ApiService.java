@@ -13,7 +13,7 @@ public class ApiService {
     String set = "";
 
     public void save(TestDto testDto) {
-        set = testDto.getContent() + testDto.getTitle();
+        set = testDto.getTitle() + " " + testDto.getContent() ;
     }
 
 

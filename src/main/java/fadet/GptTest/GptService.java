@@ -11,7 +11,7 @@ import java.util.Map;
 public class GptService {
     public String incoding(String s) {
 
-        String clientId = "Bearer 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";//애플리케이션 클라이언트 아이디값";
+        String clientId = "Bearer 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";//애플리케이션 클라이언트 아이디값";
 
         String apiURL = "https://api.openai.com/v1/completions";
         String text = "{\"model\": \"text-davinci-003\", \"prompt\": \""+s+"\", \"temperature\": 0.5, \"max_tokens\": 7}";
