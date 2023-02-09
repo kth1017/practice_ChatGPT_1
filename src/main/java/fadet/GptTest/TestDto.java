@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class TestDto {
-    private String title;
-    private String content;
+    private String originQ;
+    private String originA;
 }

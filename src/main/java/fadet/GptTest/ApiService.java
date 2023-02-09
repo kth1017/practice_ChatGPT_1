@@ -10,14 +10,19 @@ import java.util.List;
 @Service
 public class ApiService {
 
-    String set = "";
+    String originQ = "";
+    String originA = "";
 
     public void save(TestDto testDto) {
-        set = testDto.getTitle() + " " + testDto.getContent() ;
+        originQ = testDto.getOriginQ();
+        originA = testDto.getOriginA();
     }
 
 
-    public String list() {
-        return set;
+    public String putQ() {
+        return originQ;
+    }
+    public String putA() {
+        return originA;
     }
 }

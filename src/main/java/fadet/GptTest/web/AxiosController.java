@@ -21,15 +21,15 @@ public class AxiosController {
 
     @GetMapping("/api/hello")
     public String test() {
-        return "입력 데이터 = " + apiService.list() + " 번역 = " + pService.incoding("안녕하세요") + " 답변 = " + gptService.incoding("Capital of Korea?"); 
+        return " / 번역 / " + pService.incoding(apiService.putQ()) + " / 답변 / " + gptService.incoding(apiService.putA());
     }
 
     @PostMapping("/request")
     public void save(@RequestBody TestDto testDto) {
 
         apiService.save(testDto);
-        System.out.println("title = "+ testDto.getTitle());
-        System.out.println("content = "+ testDto.getContent());
+        System.out.println("OriginQ = "+ testDto.getOriginQ());
+        System.out.println("OriginA = "+ testDto.getOriginA());
 
     }
 }
