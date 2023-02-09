@@ -14,17 +14,9 @@ function Form(props) {
             </form>
 }
 
-function Form2(props) {
-    return <form onSubmit={()=> {
-        props.onForm2();
-    }}>
-        <p><input type="submit" value="create"></input></p>
-    </form>
-}
 
 function App() {
     const [hello, setHello] = useState('');
-    const [data, setData] = useState('');
 
     useEffect(() => {
         axios.get('/api/hello')
@@ -50,37 +42,8 @@ function App() {
                     console.log(error);
                   })
             }}></Form>
-            <Form2 onForm2={() => {
-                axios.post("/papago/n2mt", 
-                {
-                    source: 'ko',
-                    target: 'en',
-                    text: '반갑습니다',
-                }, {
-                
-                        baseURL: 'https://openapi.naver.com/v1/',
-                        headers: {
-                            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                            'x-naver-client-id': "Gq8U7FfphGubx99OjBXA",
-                            'x-naver-client-secret': "02aXTtkjy2",
-                        },
-                   }
-              )
-
-              .then(function (response) {
-                setData(response);
-              })
-              .catch(function (error) {
-                console.log(error);
-              })
-
-            }
-            }></Form2>
             
-                        백엔드에서 가져온 데이터입니다 : {hello} {data}
-
-
-
+                        백엔드에서 가져온 데이터입니다 : {hello}
         </div>
     );
 }
