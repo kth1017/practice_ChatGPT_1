@@ -1,3 +1,5 @@
 1 gptService에 한글 입력하면 utf-8 코덱이 없어 json 변환이 안됨
 
 2 package.json에서 설치된 라이브러리 확인 가능
+
+3 onChange는 html에선 마우스 벗어나면 호출 리액트에선 값이 변경되면 호출 

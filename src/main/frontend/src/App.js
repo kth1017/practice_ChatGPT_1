@@ -3,12 +3,18 @@ import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 
 function Form(props) {
+    const [newinputQ, setNewinputQ] = useState("null");
+
     return <form onSubmit={event =>{
         const originQ = event.target.originQ.value;
         const originA = event.target.originA.value;
         props.onForm(originQ, originA);
     }}>
-                <p><input type="text" name="originQ" placeholder='originQ'></input></p>
+                <p><input type="text" name="originQ" placeholder='originQ' value={newinputQ} onChange={
+                    event => {
+                        setNewinputQ(event.target.value);
+                    }
+                }></input></p>
                 <p><textarea name='originA' placeholder='originA'></textarea></p>
                 <p><input type="submit" value="create"></input></p>
             </form>

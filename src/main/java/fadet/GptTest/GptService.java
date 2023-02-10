@@ -14,7 +14,7 @@ public class GptService {
         String clientId = "Bearer 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";//애플리케이션 클라이언트 아이디값";
 
         String apiURL = "https://api.openai.com/v1/completions";
-        String text = "{\"model\": \"text-davinci-003\", \"prompt\": \""+s+"\", \"temperature\": 1, \"max_tokens\":1280}";
+        String text = "{\"model\": \"text-davinci-003\", \"prompt\": \""+s+"\", \"temperature\": 0.1, \"max_tokens\":1280}";
 
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("Content-Type", "application/json");
