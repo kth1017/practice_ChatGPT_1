@@ -23,37 +23,29 @@ function Form(props) {
             </form>
 }
 
-function Button(props) {
-
-    return <form onSubmit={event =>{
-        event.preventDefault();
-        props.onButton();
-    }}><p><input type="submit" value="button" /></p>
-     
-    </form>
-}
-
 
 function App() {
     const [hello, setHello] = useState('');
-    const [bindingq, setBindingQ] = useState('init');
-
-    console.log("submit전 bindingq = " + bindingq);   
-
+    const [test, setTest] = useState([]);
+    const [bindingQ, setBindingQ] = useState('init'); 
+    
     useEffect(() => {
         axios.get('/api/hello')
         .then(response => setHello(response.data))
         .catch(error => console.log(error))
-    }, [bindingq]);
+    }, [bindingQ]);
 
     useEffect(() => {
-        
-    }, [bindingq])
+        axios.get('/apiTest')
+        .then(response => {setTest(response.data)})
+        .catch(error => console.log(error))
+    }, []);
+    
 
     return (
-
+        <>
         <div>
-            <Form Q={bindingq} onForm={(_originQ, _originA) => {
+            <Form Q={bindingQ} onForm={(_originQ, _originA) => {
                 // console.log("2nd = " + _title);
                 // setTitle(_title); < 이거 작동안함
 
@@ -68,16 +60,12 @@ function App() {
                     console.log(error);
                   });
                 setBindingQ(_originQ);            
-
-
             }}></Form>
-            
-                        백엔드에서 가져온 데이터입니다 : {hello}
-            <Button onButton={()=>{
-                setBindingQ('button');
-                console.log("버튼 누른 후 bindingQ = " + bindingq);
-            }}></Button>        
+                                 백엔드에서 가져온 데이터입니다 : {hello}
         </div>
+        {test.map((param) => (
+        <input type="submit" value={param} />))}
+        </>
     );
 }
 

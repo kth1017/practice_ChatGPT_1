@@ -32,4 +32,9 @@ public class AxiosController {
         System.out.println("OriginA = "+ testDto.getOriginA());
 
     }
+
+    @GetMapping("/apiTest")
+    public String[] test2() {
+        return apiService.putKey();
+    }
 }

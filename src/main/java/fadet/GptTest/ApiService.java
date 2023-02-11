@@ -12,6 +12,7 @@ public class ApiService {
 
     String originQ = "";
     String originA = "";
+    String[] keywords = {"java", "js"} ;
 
     public void save(TestDto testDto) {
         originQ = testDto.getOriginQ();
@@ -24,5 +25,9 @@ public class ApiService {
     }
     public String putA() {
         return originA;
+    }
+
+    public String[] putKey() {
+        return keywords;
     }
 }
