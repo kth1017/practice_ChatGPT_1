@@ -5,7 +5,7 @@ import axios from 'axios';
 
 
 function Form(props) {
-    const [newinputQ, setNewinputQ] = useState(props.Q);
+    const [newInputQ, setNewInputQ] = useState(props.Q);
 
     return <form onSubmit={event =>{
         event.preventDefault();
@@ -13,9 +13,9 @@ function Form(props) {
         const originA = event.target.originA.value;
         props.onForm(originQ, originA);
     }}>
-                <p><input type="text" name="originQ" placeholder='originQ' value={newinputQ} onChange={
+                <p><input type="text" name="originQ" placeholder='originQ' value={newInputQ} onChange={
                     event => {
-                        setNewinputQ(event.target.value);
+                        setNewInputQ(event.target.value);
                     }
                 }></input></p>
                 <p><textarea name='originA' placeholder='originA'></textarea></p>
@@ -23,27 +23,37 @@ function Form(props) {
             </form>
 }
 
+function Button(props) {
+
+    return <form onSubmit={event =>{
+        event.preventDefault();
+        props.onButton();
+    }}><p><input type="submit" value="button" /></p>
+     
+    </form>
+}
+
 
 function App() {
     const [hello, setHello] = useState('');
-    const [stateq, setStateQ] = useState('init');
-    var q = "";
-    var saveQ = '';
+    const [bindingq, setBindingQ] = useState('init');
 
-    console.log("시작 q " + q);
-    console.log("시작 saveQ " + saveQ);  
-    console.log("시작 stateQ " + stateq);  
+    console.log("submit전 bindingq = " + bindingq);   
 
     useEffect(() => {
         axios.get('/api/hello')
         .then(response => setHello(response.data))
         .catch(error => console.log(error))
-    }, [stateq]);
+    }, [bindingq]);
+
+    useEffect(() => {
+        
+    }, [bindingq])
 
     return (
 
         <div>
-            <Form Q={stateq} onForm={(_originQ, _originA) => {
+            <Form Q={bindingq} onForm={(_originQ, _originA) => {
                 // console.log("2nd = " + _title);
                 // setTitle(_title); < 이거 작동안함
 
@@ -57,14 +67,16 @@ function App() {
                   .catch(function (error) {
                     console.log(error);
                   });
-                saveQ = _originQ; 
-                console.log(saveQ);
-                setStateQ(saveQ);              
+                setBindingQ(_originQ);            
 
 
             }}></Form>
             
                         백엔드에서 가져온 데이터입니다 : {hello}
+            <Button onButton={()=>{
+                setBindingQ('button');
+                console.log("버튼 누른 후 bindingQ = " + bindingq);
+            }}></Button>        
         </div>
     );
 }
