@@ -64,7 +64,17 @@ function App() {
                                  백엔드에서 가져온 데이터입니다 : {hello}
         </div>
         {test.map((param) => (
-        <input type="submit" value={param} />))}
+        <input name="button" type="button" value={param} onClick={(event) => {              
+                axios.post('/request',
+                {originQ: `What is the ${param}?`, originA: `What is the ${param}?`})
+                .then(function (response) {
+                    console.log(response);
+                  })
+                .catch(function (error) {
+                    console.log(error);
+                  });
+                setBindingQ({param})}
+        }/>))}
         </>
     );
 }
