@@ -1,5 +1,7 @@
 package fadet.GptTest;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,7 +20,6 @@ public class ApiService {
         originQ = testDto.getOriginQ();
         originA = testDto.getOriginA();
     }
-
 
     public String putQ() {
         return originQ;

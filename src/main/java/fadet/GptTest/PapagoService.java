@@ -78,7 +78,8 @@ public class PapagoService {
             StringBuilder responseBody = new StringBuilder();
 
             String line;
-            while ((line = lineReader.readLine()) != null) {
+            while((line = lineReader.readLine()) != null) {
+                System.out.println("line out");
                 responseBody.append(line);
             }
 
@@ -86,6 +87,29 @@ public class PapagoService {
         } catch (IOException e) {
             throw new RuntimeException("API 응답을 읽는데 실패했습니다.", e);
         }
+    }
+    public String getTranText(String body) {
+         int beginIndex = 0;
+         int endIndex = 0;
+
+         if(body.contains("translatedText")) {
+             int index = body.indexOf("translatedText");
+             beginIndex = index;
+         } else {
+             System.out.println("번역T 없음");
+         }
+
+        if(body.contains("engineType")) {
+            int index = body.indexOf("engineType");
+            endIndex = index;
+        } else {
+            System.out.println("엔진타입 없음");
+        }
+
+
+         String result = body.substring(beginIndex+17, endIndex-3);
+
+         return result;
     }
 }
 

@@ -11,7 +11,16 @@ function Form(props) {
         event.preventDefault();
         const originQ = event.target.originQ.value;
         const originA = event.target.originA.value;
-        props.onForm(originQ, originA);
+        axios.post('/request', 
+                    {originQ: `${originQ}`, originA: `${originA}`}
+                  )
+                  .then(function (response) {
+                    console.log(response);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+        props.onForm(originQ);
     }}>
                 <p><input type="text" name="originQ" placeholder='originQ' value={newInputQ} onChange={
                     event => {
@@ -45,20 +54,9 @@ function App() {
     return (
         <>
         <div>
-            <Form Q={bindingQ} onForm={(_originQ, _originA) => {
+            <Form Q={bindingQ} onForm={(_originQ) => {
                 // console.log("2nd = " + _title);
                 // setTitle(_title); < 이거 작동안함
-
-                axios.post('/request', 
-                    {originQ: `${_originQ}`, originA: `${_originA}`}
-                  )
-
-                  .then(function (response) {
-                    console.log(response);
-                  })
-                  .catch(function (error) {
-                    console.log(error);
-                  });
                 setBindingQ(_originQ);            
             }}></Form>
                                  백엔드에서 가져온 데이터입니다 : {hello}
