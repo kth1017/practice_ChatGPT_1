@@ -1,5 +1,9 @@
 package fadet.GptTest;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -8,12 +12,16 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @org.springframework.stereotype.Service
 public class PapagoService {
+
+    private final ApiKey apiKey;
+
     public String incoding(String s) {
 
-        String clientId = "Gq8U7FfphGubx99OjBXA";//애플리케이션 클라이언트 아이디값";
-        String clientSecret = "02aXTtkjy2";//애플리케이션 클라이언트 시크릿값";
+        String clientId = apiKey.getApiId();//애플리케이션 클라이언트 아이디값";
+        String clientSecret = apiKey.getApiSecret();//애플리케이션 클라이언트 시크릿값";
 
         String apiURL = "https://openapi.naver.com/v1/papago/n2mt";
         String text;
@@ -79,7 +87,6 @@ public class PapagoService {
 
             String line;
             while((line = lineReader.readLine()) != null) {
-                System.out.println("line out");
                 responseBody.append(line);
             }
 

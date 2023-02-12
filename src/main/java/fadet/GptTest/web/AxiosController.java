@@ -6,9 +6,6 @@ import fadet.GptTest.GptService;
 import fadet.GptTest.PapagoService;
 import fadet.GptTest.TestDto;
 import lombok.RequiredArgsConstructor;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,12 +17,19 @@ public class AxiosController {
 
     private final ApiService apiService;
     private final PapagoService pService;
-    private final GptService gptService;
+    private final GptService gService;
 
-    @GetMapping("/api/hello")
-    public String test() {
-        return " / 번역 / " + pService.getTranText(pService.incoding(apiService.putQ())) + " / 답변 / " + gptService.incoding(apiService.putA());
+    @GetMapping("/api/transQ")
+    public String transQ() {
+        return pService.incoding(apiService.putQ());
     }
+    
+    @GetMapping("/api/sendQ")
+    public String sendQ() {
+        return gService.incoding(apiService.putQ());
+    }
+
+    
 
     @PostMapping("/request")
     public void save(@RequestBody TestDto testDto) {
@@ -33,7 +37,6 @@ public class AxiosController {
 
         apiService.save(testDto);
         System.out.println("OriginQ = "+ testDto.getOriginQ());
-        System.out.println("OriginA = "+ testDto.getOriginA());
 
     }
 
