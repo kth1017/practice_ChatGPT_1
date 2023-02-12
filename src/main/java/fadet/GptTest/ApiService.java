@@ -8,7 +8,8 @@ public class ApiService {
 
     String originQ = "";
     String originA = "";
-    String[] keywords = {"java", "js"} ;
+    String[] keywords = {"java", "js", "react", "spring", "DOM", "spring modules", "python",
+    "RDBMS"} ;
 
     public void save(TestDto testDto) {
         originQ = testDto.getOriginQ();

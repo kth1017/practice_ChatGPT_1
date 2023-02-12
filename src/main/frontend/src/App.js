@@ -46,7 +46,7 @@ function App() {
         axios.get('/apiTest')
         .then(response => {setTest(response.data)})
         .catch(error => console.log(error))
-    }, [bindingQ]);
+    }, []);
     
 
     return (
@@ -61,7 +61,7 @@ function App() {
         </div>
         추천 질문<br/>
         {test.map((param, index) => (
-        <input key={index} name="button" type="button" value={param} onClick={(event) => {   
+        <input key={index} name="button" type="button" value={param} onClick={(event) => {
                 event.preventDefault();           
                 axios.post('/request',
                 {originQ: `What is the ${param}?`, originA: `What is the ${param}?`})
