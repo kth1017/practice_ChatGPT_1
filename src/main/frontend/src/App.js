@@ -34,12 +34,28 @@ function Form(props) {
             
 }
 
+function CustomDial(props){
+    const [mod, setMod] = useState(props.Mod);
+    return <Dialog open={mod}>
+    <DialogTitle>사용법</DialogTitle>
+    <DialogContent> 
+        <DialogContentText>
+            1. ai에게 할 질문이 한글이라면 번역을 위한 한글 질문을 입력해주시거나 추천 질문 버튼을 눌러주세요.
+            2. 번역된 질문 또는 직접 입력한 영어 질문이 'ai에게 질문하기' 버튼을 누르시면 아래에 답변이 출력됩니다.
+        </DialogContentText>
+        <DialogActions>
+            <Button variant='contained' onClick={(event) => console.log(event)}>닫기</Button>
+        </DialogActions>
+    </DialogContent>
+</Dialog>
+}
+
 function App() {
     const [test, setTest] = useState([]);
     const [bindingQ, setBindingQ] = useState('bindingQ'); 
     const [transQ, setTransQ] = useState(null);
-    const [resultA, SetResultA] = useState('resultA');
-    const [dialMod, setDialMod] = useState(true);
+    const [resultA, SetResultA] = useState(null);
+    const [dialMod, setDialMod] = useState(false);
 
     
     useEffect(() => {
@@ -54,25 +70,20 @@ function App() {
         .catch(error => console.log(error))
     }, []);
     
+    useEffect(() => {
+        axios.get('/api/sendQ')
+        .then(response => SetResultA(JSON.stringify(response.data.choices[0].text).replace(/"/gi, "")))
+        .catch(error => console.log(error)) 
+    }, [resultA]);
 
     return (
         <>
-        <Dialog open={dialMod}>
-            <DialogTitle>사용법</DialogTitle>
-            <DialogContent> 
-                <DialogContentText>
-                    사이트 이용
-                </DialogContentText>
-                <DialogActions>
-                    <Button variant='contained' onClick={() => {setDialMod(false)}}>닫기</Button>
-                </DialogActions>
-            </DialogContent>
-        </Dialog>
+        <CustomDial Mod={dialMod}></CustomDial>
         <span>Gpt api 웹사이트</span><br/>  <br/>  
         <Container>  
             <ButtonGroup>
-                <Button variant='contained'>초기화</Button>
-                <Button variant='outlined' onClick={() => {setDialMod(true)}}>도움말 다시열기</Button>
+                <Button variant='contained' onClick={() => {}}>초기화</Button>
+                <Button variant='outlined' onClick={() => {}}>도움말 다시열기</Button>
             </ButtonGroup><br/><br/>  
         </Container>
         <Container fixed> 
@@ -120,9 +131,7 @@ function App() {
                         console.log(error);
                     });
                     setBindingQ({LocalTransQ});
-                axios.get('/api/sendQ')
-                .then(response => SetResultA(JSON.stringify(response.data.choices[0].text).replace(/"/gi, "")))
-                .catch(error => console.log(error)) 
+                
                 setBindingQ(LocalTransQ);    
             }}>
                 <p><Input type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={transQ} onChange={
