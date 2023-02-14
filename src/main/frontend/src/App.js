@@ -1,5 +1,5 @@
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, createContext, useContext} from 'react';
 import axios from 'axios';
 import { Button, ButtonGroup } from '@mui/material'
 import { Input, TextField } from '@mui/material';
@@ -9,6 +9,23 @@ import { Typography} from '@mui/material';
 import '@fontsource/roboto/700.css';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 
+const ModContext = React.createContext();
+
+
+function ModProvider({ children }) {
+  const modState = useState(true);
+  return <ModContext.Provider value={modState}>
+         {children}
+        </ModContext.Provider>;
+}
+
+function useModState() {
+  const value = useContext(ModContext);
+  if (value === undefined) {
+    throw new Error('error')
+        
+    }   return value;
+}
 
 function Form(props) {
     const [newInputQ, setNewInputQ] = useState(null);
@@ -39,10 +56,13 @@ function Form(props) {
 }
 
 function CustomDial(props){
-    const[mod, setMod] = useState(true);
+    const [mod, setMod] = useModState();
+    const Mfalse = () => setMod(false);
+    
 
     // setMod(props.Mod) 이 코드는 순환 참조를 일으킴
-    return <Dialog open={props.Mod}> // 이상태라면 닫기가 안됨
+     // 이상태라면 닫기가 안됨
+    return <Dialog open={mod}>
     <DialogTitle>사용법</DialogTitle>
         <DialogContent> 
             <DialogContentText>
@@ -50,14 +70,16 @@ function CustomDial(props){
                 2. 번역된 질문 또는 직접 입력한 영어 질문이 'ai에게 질문하기' 버튼을 누르시면 아래에 답변이 출력됩니다.
             </DialogContentText>
             <DialogActions>
-                <Button variant='contained' onClick={() => {props.Mod=false}}>닫기</Button>
+                <Button variant='contained' onClick={Mfalse}>닫기</Button>
             </DialogActions>
         </DialogContent>
 </Dialog>
 }
 
 function DialButton(props){
-    return <Button variant='outlined' onClick={() => {props.TurnMod()}}>도움말 다시열기</Button>
+    const [mod, setMod] = useModState();
+    const Mtrue = () => setMod(true)
+    return <Button variant='outlined' onClick={Mtrue}>도움말 다시열기</Button>
 }
 
 function App() {
@@ -88,6 +110,7 @@ function App() {
 
     return (
         <>
+        <ModProvider>
         <Container>
         <CustomDial Mod={dialMod}></CustomDial> <br/>
         <Grid Containor>
@@ -97,7 +120,7 @@ function App() {
         <Container>  
             <ButtonGroup>
                 <Button variant='contained' onClick={() => {window.location.reload()}}>초기화</Button>
-                <DialButton TurnMod={() => {SetDialMod(true)}}></DialButton>
+                <DialButton></DialButton>
             </ButtonGroup><br/><br/>  
         </Container>
         <Container fixed> 
@@ -126,8 +149,6 @@ function App() {
                             console.log(error);
                         });
                         setBindingQ(`What is the ${param}?`);
-                        
-                        
                         }
                         
                 }>{param}</Button>))}
@@ -144,14 +165,15 @@ function App() {
                         {originQ: `${LocalTransQ}`})
                         .then(function (response) {
                             console.log(response);
+                            axios.get('/api/sendQ')
+                                .then(response => SetResultA(JSON.stringify(response.data.choices[0].text).slice(5,-1).replace(/\\n/gi,'\n')))
+                                .catch(error => console.log(error));
+                                setTransQ(LocalTransQ);
                         })
                         .catch(function (error) {
                             console.log(error);
                         });
-                        axios.get('/api/sendQ')
-                        .then(response => SetResultA(JSON.stringify(response.data.choices[0].text).replace(/\\n/gi,'\n')))
-                        .catch(error => console.log(error));
-                        setTransQ(LocalTransQ);        
+                            
                     }}>
                     <p><Input type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={transQ} onChange={
                             event => {
@@ -170,6 +192,7 @@ function App() {
             </Container>    
         </Container>
         </Container>
+        </ModProvider>
         </>
     );
 }
