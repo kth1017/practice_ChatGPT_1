@@ -1,3 +1,4 @@
+#app return 코드
 return (
         <>
         <Container>
@@ -97,3 +98,19 @@ return (
         </>
     );
 }
+#버튼 코드
+{test.map((param, index) => (
+                        <Button variant="outlined" key={index} value={param||""} onClick={(event) => {                    
+                                event.preventDefault();           
+                                axios.post('/request',
+                                {originQ: `What is the ${param}?`, originA: `What is the ${param}?`})
+                                .then(function (response) {
+                                    console.log(response);
+                                })
+                                .catch(function (error) {
+                                    console.log(error);
+                                });
+                                setBindingQ(`What is the ${param}?`);
+                                }
+                                
+                        }>{param}</Button>))}

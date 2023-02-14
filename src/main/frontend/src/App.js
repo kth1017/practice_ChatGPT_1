@@ -1,11 +1,8 @@
 
 import React, {useEffect, useState, createContext, useContext} from 'react';
 import axios from 'axios';
-import { Button, ButtonGroup } from '@mui/material'
-import { Input, TextField } from '@mui/material';
-import { Container, Grid } from '@mui/material';
+import { Container, Grid, Button, ButtonGroup, Input, TextField, Typography } from '@mui/material'
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import { Typography} from '@mui/material';
 import '@fontsource/roboto/700.css';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 
@@ -71,11 +68,15 @@ function App() {
     const [bindingQ, setBindingQ] = useState(null); 
     const [transQ, setTransQ] = useState(null);
     const [resultA, SetResultA] = useState(null);
+    const result = [];
 
     useEffect(() => {
         console.log(`시작시 tq = ${transQ}, 시작시 bq = ${bindingQ}`);
         axios.get('/apiTest')
-        .then(response => {setTest(response.data)})
+        .then(response => {
+            setTest(response.data);
+                            
+        })
         .catch(error => console.log(error))
         
     }, []);
@@ -87,8 +88,24 @@ function App() {
         .catch(error => console.log(error))
         console.log(`번역 get tq = ${transQ}, 시작시 bq = ${bindingQ}`);
     }, [bindingQ]);
-
     
+
+const a = ()=> {
+     for (let i=0;i<test.length;i++) {
+        result.push(<Button variant="outlined" key={test[i]} value={test[i]} onClick={(event) => {                    
+                    event.preventDefault();           
+                    axios.post('/request',
+                        {originQ: `What is the ${test[i]}?`, originA: `What is the ${test[i]}?`})
+                        .then(function (response) {
+                            console.log(response);
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                    setBindingQ(`What is the ${test[i]}?`);
+                    }}>{test[i]}</Button>)}
+     return result;
+}      
 
     return (
         <>
@@ -114,21 +131,7 @@ function App() {
                         <Grid item xs={10}> 
                         추천 질문<br/><br/> 
                         <ButtonGroup variant="outlined" aria-label="outlined button group">
-                        {test.map((param, index) => (
-                        <Button variant="outlined" key={index} value={param||""} onClick={(event) => {                    
-                                event.preventDefault();           
-                                axios.post('/request',
-                                {originQ: `What is the ${param}?`, originA: `What is the ${param}?`})
-                                .then(function (response) {
-                                    console.log(response);
-                                })
-                                .catch(function (error) {
-                                    console.log(error);
-                                });
-                                setBindingQ(`What is the ${param}?`);
-                                }
-                                
-                        }>{param}</Button>))}
+                        {a()}
                         </ButtonGroup></Grid>  
                     </Grid>
                     </Container>
@@ -147,18 +150,13 @@ function App() {
                                         .catch(error => console.log(error));
                                         setTransQ(LocalTransQ);
                                 })
-                                .catch(function (error) {
-                                    console.log(error);
-                                });
-                                    
+                                .catch(error => {console.log(error)});        
                             }}>
                             <p><Input required type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={transQ} onChange={
-                                    event => {
-                                        setTransQ(event.target.value);
-                                    }} /></p>                
+                                    event => {setTransQ(event.target.value);}} /></p>                
                             <p><Button variant='outlined' type="submit">ai에게 질문</Button></p>
                     </form>
-                    </Container> 
+                    </Container>
                     <br/>
                     <Container sx={{ border: 1, padding:2, borderColor: 'divider' }}>    
                     <br/>답변<br/><br/> 
