@@ -38,30 +38,26 @@ function Form(props) {
             
 }
 
-function TransForm(props){
-    const [tq, SetTq] = useState(null);
-    const [propsTq, SetPropsTq] = useState(props.Q);
+function CustomDial(props){
+    const[mod, setMod] = useState(true);
 
-    return <form onSubmit={event => {
+    // setMod(props.Mod) 이 코드는 순환 참조를 일으킴
+    return <Dialog open={props.Mod}> // 이상태라면 닫기가 안됨
+    <DialogTitle>사용법</DialogTitle>
+        <DialogContent> 
+            <DialogContentText>
+                1. ai에게 할 질문이 한글이라면 번역을 위한 한글 질문을 입력해주시거나 추천 질문 버튼을 눌러주세요.<br />
+                2. 번역된 질문 또는 직접 입력한 영어 질문이 'ai에게 질문하기' 버튼을 누르시면 아래에 답변이 출력됩니다.
+            </DialogContentText>
+            <DialogActions>
+                <Button variant='contained' onClick={() => {props.Mod=false}}>닫기</Button>
+            </DialogActions>
+        </DialogContent>
+</Dialog>
+}
 
-        const LocalTransQ = event.target.transQ.value;
-        event.preventDefault();
-        axios.post('/request',
-            {originQ: `${LocalTransQ}`})
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-        props.onTrans(tq);     
-    }}>
-        <p><Input type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={propsTq} onChange={
-                event => {
-                    SetTq(event.target.value);
-                }} /></p>                
-        <p><Button variant='outlined' type="submit">ai에게 질문</Button></p>
-    </form>
+function DialButton(props){
+    return <Button variant='outlined' onClick={() => {props.TurnMod()}}>도움말 다시열기</Button>
 }
 
 function App() {
@@ -69,7 +65,7 @@ function App() {
     const [bindingQ, setBindingQ] = useState(null); 
     const [transQ, setTransQ] = useState(null);
     const [resultA, SetResultA] = useState(null);
-    const [dialMod, setDialMod] = useState(false);
+    const [dialMod, SetDialMod] = useState(false);
 
 
     useEffect(() => {
@@ -88,25 +84,12 @@ function App() {
         console.log(`번역 get tq = ${transQ}, 시작시 bq = ${bindingQ}`);
     }, [bindingQ]);
 
-
-    
     
 
     return (
         <>
         <Container>
-        <Dialog open={dialMod}>
-            <DialogTitle>사용법</DialogTitle>
-                <DialogContent> 
-                    <DialogContentText>
-                        1. ai에게 할 질문이 한글이라면 번역을 위한 한글 질문을 입력해주시거나 추천 질문 버튼을 눌러주세요.<br />
-                        2. 번역된 질문 또는 직접 입력한 영어 질문이 'ai에게 질문하기' 버튼을 누르시면 아래에 답변이 출력됩니다.
-                    </DialogContentText>
-                    <DialogActions>
-                        <Button variant='contained' onClick={() => setDialMod(false)}>닫기</Button>
-                    </DialogActions>
-                </DialogContent>
-        </Dialog><br/>
+        <CustomDial Mod={dialMod}></CustomDial> <br/>
         <Grid Containor>
         <Grid item><QuestionAnswerIcon></QuestionAnswerIcon></Grid>
         <Grid item xs><Typography variant="h4" component="h2">gpt api를 이용한 프로그래밍 질문 웹서비스</Typography></Grid>
@@ -114,7 +97,7 @@ function App() {
         <Container>  
             <ButtonGroup>
                 <Button variant='contained' onClick={() => {window.location.reload()}}>초기화</Button>
-                <Button variant='outlined' onClick={() => {setDialMod(true)}}>도움말 다시열기</Button>
+                <DialButton TurnMod={() => {SetDialMod(true)}}></DialButton>
             </ButtonGroup><br/><br/>  
         </Container>
         <Container fixed> 
@@ -154,12 +137,28 @@ function App() {
             <br/>
             <Container sx={{ border: 1, padding:2, borderColor: 'divider' }}>     
             <br/>번역<br/>
-            <TransForm Q={transQ} onTrans={(_transQ) => {
-                axios.get('/api/sendQ')
-                .then(response => SetResultA(JSON.stringify(response.data.choices[0].text).replace(/\\n/gi,'\n')))
-                .catch(error => console.log(error));
-                setTransQ(_transQ);
-            }}></TransForm>
+            <form onSubmit={event => {
+                const LocalTransQ = event.target.transQ.value;
+                    event.preventDefault();
+                    axios.post('/request',
+                        {originQ: `${LocalTransQ}`})
+                        .then(function (response) {
+                            console.log(response);
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                        axios.get('/api/sendQ')
+                        .then(response => SetResultA(JSON.stringify(response.data.choices[0].text).replace(/\\n/gi,'\n')))
+                        .catch(error => console.log(error));
+                        setTransQ(LocalTransQ);        
+                    }}>
+                    <p><Input type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={transQ} onChange={
+                            event => {
+                                setTransQ(event.target.value);
+                            }} /></p>                
+                    <p><Button variant='outlined' type="submit">ai에게 질문</Button></p>
+            </form>
             </Container> 
             <br/>
             <Container sx={{ border: 1, padding:2, borderColor: 'divider' }}>    
