@@ -40,8 +40,8 @@ function Form(props) {
 
 function TransForm(props){
     const [tq, SetTq] = useState(null);
-    const [propsTq, SetPropsTq] = useState(null);
-    SetPropsTq(props.Q);
+    const [propsTq, SetPropsTq] = useState(props.Q);
+
     return <form onSubmit={event => {
 
         const LocalTransQ = event.target.transQ.value;
