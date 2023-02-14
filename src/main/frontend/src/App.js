@@ -5,7 +5,7 @@ import { Button, ButtonGroup } from '@mui/material'
 import { Input, TextField } from '@mui/material';
 import { Container, Grid } from '@mui/material';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import { Typography, Icon } from '@mui/material';
+import { Typography} from '@mui/material';
 import '@fontsource/roboto/700.css';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 
@@ -14,7 +14,7 @@ function Form(props) {
     const [newInputQ, setNewInputQ] = useState(null);
 
     return <form onSubmit={event =>{
-        console.log(`번역시 get tq = ${transQ}, 시작시 bq = ${bindingQ}`);
+
         event.preventDefault();
         const originQ = event.target.originQ.value;
         axios.post('/request', 
@@ -40,8 +40,10 @@ function Form(props) {
 
 function TransForm(props){
     const [tq, SetTq] = useState(null);
+    const [propsTq, SetPropsTq] = useState(null);
+    SetPropsTq(props.Q);
     return <form onSubmit={event => {
-        console.log(`질문시 post tq = ${transQ}, 시작시 bq = ${bindingQ}`);
+
         const LocalTransQ = event.target.transQ.value;
         event.preventDefault();
         axios.post('/request',
@@ -54,7 +56,7 @@ function TransForm(props){
             });
         props.onTrans(tq);     
     }}>
-        <p><Input type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={tq} onChange={
+        <p><Input type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={propsTq} onChange={
                 event => {
                     SetTq(event.target.value);
                 }} /></p>                
@@ -152,7 +154,7 @@ function App() {
             <br/>
             <Container sx={{ border: 1, padding:2, borderColor: 'divider' }}>     
             <br/>번역<br/>
-            <TransForm onTrans={(_transQ) => {
+            <TransForm Q={transQ} onTrans={(_transQ) => {
                 axios.get('/api/sendQ')
                 .then(response => SetResultA(JSON.stringify(response.data.choices[0].text).replace(/\\n/gi,'\n')))
                 .catch(error => console.log(error));
