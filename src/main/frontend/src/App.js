@@ -57,11 +57,11 @@ function CustomDial(props){
 </Dialog>
 }
 
-function DialButton(props){
-    const [mod, setMod] = useModState();
-    const Mtrue = () => setMod(true)
-    return <Button variant='outlined' onClick={Mtrue}>도움말 다시열기</Button>
-}
+    function DialButton(props){
+        const [mod, setMod] = useModState();
+        const Mtrue = () => setMod(true)
+        return <Button variant='outlined' onClick={Mtrue}>도움말 다시열기</Button>
+    }
 
 function App() {
     const [test, setTest] = useState([]);
@@ -69,6 +69,22 @@ function App() {
     const [transQ, setTransQ] = useState(null);
     const [resultA, SetResultA] = useState(null);
     const result = [];
+    const a = ()=> {
+        for (let i=0;i<test.length;i++) {
+           result.push(<Button variant="outlined" key={test[i]} value={test[i]} onClick={(event) => {                    
+                       event.preventDefault();           
+                       axios.post('/request',
+                           {originQ: `What is the ${test[i]}?`, originA: `What is the ${test[i]}?`})
+                           .then(function (response) {
+                               console.log(response);
+                           })
+                           .catch(function (error) {
+                               console.log(error);
+                           });
+                       setBindingQ(`What is the ${test[i]}?`);
+                       }}>{test[i]}</Button>)}
+        return result;
+   }      
 
     useEffect(() => {
         console.log(`시작시 tq = ${transQ}, 시작시 bq = ${bindingQ}`);
@@ -90,22 +106,7 @@ function App() {
     }, [bindingQ]);
     
 
-const a = ()=> {
-     for (let i=0;i<test.length;i++) {
-        result.push(<Button variant="outlined" key={test[i]} value={test[i]} onClick={(event) => {                    
-                    event.preventDefault();           
-                    axios.post('/request',
-                        {originQ: `What is the ${test[i]}?`, originA: `What is the ${test[i]}?`})
-                        .then(function (response) {
-                            console.log(response);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                    setBindingQ(`What is the ${test[i]}?`);
-                    }}>{test[i]}</Button>)}
-     return result;
-}      
+
 
     return (
         <>
