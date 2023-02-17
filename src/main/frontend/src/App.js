@@ -45,14 +45,14 @@ function useModState() {
     }
 
 
-    const FormContext = React.createContext();
-    function FormProvider({ children }) {
-      const formState = useState(true);
+const FormContext = React.createContext();
+function FormProvider({ children }) {
+      const formState = useState(null);
       return <FormContext.Provider value={formState}>
              {children}
             </FormContext.Provider>;
     }
-    function useFormState() {
+function useFormState() {
       const value = useContext(FormContext);
       if (value === undefined) {
         throw new Error('error')
@@ -61,7 +61,7 @@ function useModState() {
     }
 
 function Form(props) {
-    const [newInputQ, setNewInputQ] = useState(null);
+    const [bindingQ, setBindingQ] = useFormState();
     return <form onSubmit={event =>{
         event.preventDefault();
         const originQ = event.target.originQ.value;
@@ -73,8 +73,8 @@ function Form(props) {
                   .catch(function (error) {
                     console.log(error);});
         props.onForm(originQ);}}>
-                <p><Input type="text" name="originQ" placeholder='한글로 질문을 입력해주세요' value={newInputQ} onChange=
-                {event => {setNewInputQ(event.target.value)}} /></p>
+                <p><Input type="text" name="originQ" placeholder='한글로 질문을 입력해주세요' value={bindingQ||""} onChange=
+                {event => {setBindingQ(event.target.value)}} /></p>
                 <p><Button variant="outlined" type="submit">번역</Button></p>
             </form>         
 }
@@ -85,7 +85,9 @@ function Form(props) {
 
 function App() {
     const [test, setTest] = useState([]);
-    const [bindingQ, setBindingQ] = useState(null); 
+    const [bindingQ, setBindingQ] = useState(null);
+
+
     const [transQ, setTransQ] = useState(null);
     const [resultA, SetResultA] = useState(null);
     const result = [];
@@ -147,7 +149,7 @@ function App() {
                     <Grid Container>
                         <Grid item xs={2}>   
                         질문 입력<br/>    
-                        <Form Q={bindingQ} onForm={(_originQ) => {setBindingQ(_originQ);}}></Form>
+                        <FormProvider><Form onForm={(_originQ) => {setBindingQ(_originQ);}}></Form></FormProvider>
                         </Grid>
                         <Grid item xs={10}> 
                         추천 질문<br/><br/> 
@@ -173,7 +175,7 @@ function App() {
                                 })
                                 .catch(error => {console.log(error)});        
                             }}>
-                            <p><Input required type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={transQ} onChange={
+                            <p><Input required type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={transQ||''} onChange={
                                     event => {setTransQ(event.target.value);}} /></p>                
                             <p><Button variant='outlined' type="submit">ai에게 질문</Button></p>
                     </form>
@@ -181,7 +183,7 @@ function App() {
                     <br/>
                     <Container sx={{ border: 1, padding:2, borderColor: 'divider' }}>    
                     <br/>답변<br/><br/> 
-                        <TextField fullWidth multiline value={resultA} onChange={event => {SetResultA(event.target.value);}}>{resultA}</TextField>
+                        <TextField fullWidth multiline value={resultA||''} onChange={event => {SetResultA(event.target.value);}}>{resultA}</TextField>
                     </Container>    
                 </Container>
             </Container>

@@ -41,6 +41,9 @@
 
 20 [테스트 가완료] props로 함수를 전달할때 람다를 안 쓰고 props={setState}해버리면 무한 리렌더링됨
 
+21 [context 사용] App은 context사용시 배제되므로 리덕스 사용 전까진 보류
+
+
 
 
 
