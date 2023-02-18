@@ -5,6 +5,9 @@ import { Container, Grid, Button, ButtonGroup, Input, TextField, Typography } fr
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import '@fontsource/roboto/700.css';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import Loading from './Loading';
+
+
 
 const ModContext = React.createContext();
 function ModProvider({ children }) {
@@ -77,7 +80,7 @@ function Form(props) {
                 {event => {setBindingQ(event.target.value)}} /></p>
                 <p><Button variant="outlined" type="submit">번역</Button></p>
             </form>         
-}
+} 
 
 function ButtonForm(props) {
     const qArr = props.qArr;
@@ -95,20 +98,21 @@ function ButtonForm(props) {
                                 console.log(error);
                             });
                         props.postQ(`What is the ${qArr[i]}?`);
-                        }}>{qArr[i]}</Button>)}
-
-                        
-         return result;
-         
-    }
+                        }}>{qArr[i]}</Button>);  
+                        console.log(result)     ;     
+            }  
+        return result; 
+    } 
     return grouping();   
 }
+
 
 function App() {
     const [bindingQ, setBindingQ] = useState(null);
     const [transQ, setTransQ] = useState(null);
     const [resultA, setResultA] = useState(null);
     const [qArr, setQArr] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         axios.get('/apiTest')
@@ -121,8 +125,11 @@ function App() {
         .then(response => {setTransQ(JSON.stringify(response.data.message.result.translatedText).replace(/"/gi, ""));
                             })
         .catch(error => console.log(error))
-        console.log(`번역 get tq = ${transQ}, 시작시 bq = ${bindingQ}`);
     }, [bindingQ]);
+
+    useEffect(() => {
+        setLoading(false);
+    }, [resultA]);
 
     return (
         <>
@@ -156,6 +163,7 @@ function App() {
                     <br/>번역<br/>
                     <form onSubmit={event => {
                         const LocalTransQ = event.target.transQ.value;
+                            setLoading(true);
                             event.preventDefault();
                             axios.post('/request',
                                 {originQ: `${LocalTransQ}`})
@@ -181,6 +189,7 @@ function App() {
                 </Container>
             </Container>
         </ModProvider>
+        {loading && <Loading />}
         </>
         );
 }
