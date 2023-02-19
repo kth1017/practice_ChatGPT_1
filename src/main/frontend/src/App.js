@@ -48,9 +48,11 @@ function useModState() {
     }
 
 
+
+
 const FormContext = React.createContext();
 function FormProvider({ children }) {
-      const formState = useState(null);
+      const formState = useState(["start1", "start2"]);
       return <FormContext.Provider value={formState}>
              {children}
             </FormContext.Provider>;
@@ -60,11 +62,64 @@ function useFormState() {
       if (value === undefined) {
         throw new Error('error')
             
-        }   return value;
+        }   return value[0][0];
     }
+
+const TransQContext = React.createContext();
+function TransQProvider({ children }) {
+        const TransQState = useState(null);
+        return <TransQContext.Provider value={TransQState}>
+                {children}
+            </TransQContext.Provider>;
+}
+function useTransQState() {
+        const value = useContext(TransQContext);
+        if (value === undefined) {
+        throw new Error('error')
+            
+        }   return value;
+}    
+
+const ResultAContext = React.createContext();
+function ResultAProvider({ children }) {
+        const ResultAState = useState(null);
+        return <ResultAContext.Provider value={ResultAState}>
+                {children}
+            </ResultAContext.Provider>;
+}
+function useResultAState() {
+        const value = useContext(ResultAContext);
+        if (value === undefined) {
+        throw new Error('error')
+            
+        }   return value;
+}  
+
+
+function Box() {
+    return <>
+            <TransQProvider><ResultAProvider><FormProvider>
+                <Container sx={{ border: 1, padding: 2, borderColor: 'divider' }}>
+                    질문 입력 <Form></Form>
+                    추천 질문 <br />
+                    <ButtonGroup><ButtonForm></ButtonForm></ButtonGroup>
+                </Container>
+                <Container sx={{ border: 1, padding: 2, borderColor: 'divider' }}>
+                    번역 <TransForm></TransForm>
+                </Container>
+                <Container sx={{ border: 1, padding: 2, borderColor: 'divider' }}>
+                    답변 <ResultForm></ResultForm>
+                </Container>
+            </FormProvider></ResultAProvider></TransQProvider>
+        </>
+}
+
 
 function Form(props) {
     const [bindingQ, setBindingQ] = useFormState();
+    const [transQ, setTransQ] = useTransQState();
+    const [resultA, setResultA] = useResultAState();
+    
     return <form onSubmit={event =>{
         event.preventDefault();
         const originQ = event.target.originQ.value;
@@ -75,15 +130,31 @@ function Form(props) {
                   })
                   .catch(function (error) {
                     console.log(error);});
-        props.onForm(originQ);}}>
+        axios.get('/api/transQ')
+                    .then(response => {setTransQ(JSON.stringify(response.data.message.result.translatedText).replace(/"/gi, ""));
+                                        })
+                    .catch(error => console.log(error))
+
+
+        }}>
                 <p><Input type="text" name="originQ" placeholder='한글로 질문을 입력해주세요' value={bindingQ||""} onChange=
                 {event => {setBindingQ(event.target.value)}} /></p>
                 <p><Button variant="outlined" type="submit">번역</Button></p>
-            </form>         
+            </form>       
 } 
 
 function ButtonForm(props) {
-    const qArr = props.qArr;
+    const [bindingQ, setBindingQ] = useFormState();
+    const [transQ, setTransQ] = useTransQState();
+    const [resultA, setResultA] = useResultAState();
+    const [qArr, setQArr] = useState([]);
+
+    useEffect(() => {
+        axios.get('/apiTest')
+        .then(response => setQArr(response.data))               
+        .catch(error => console.log(error))
+    }, []);
+
     const grouping = () => {
         const result = [];
         for (let i=0;i<qArr.length;i++) {
@@ -97,45 +168,55 @@ function ButtonForm(props) {
                             .catch(function (error) {
                                 console.log(error);
                             });
-                        props.postQ(`What is the ${qArr[i]}?`);
+                        setTransQ(`What is the ${qArr[i]}?`);
                         }}>{qArr[i]}</Button>);  
                             
             }  
         return result; 
     } 
-    return grouping();   
+    return grouping();                        
+}
+
+function TransForm(props) {
+    const [bindingQ, setBindingQ] = useFormState();
+    const [transQ, setTransQ] = useTransQState();
+    const [resultA, setResultA] = useResultAState();
+    return <form onSubmit={event => {
+        const LocalTransQ = event.target.transQ.value;
+            event.preventDefault();
+            axios.post('/request',
+                {originQ: `${LocalTransQ}`})
+                .then(function (response) {
+                    
+                    axios.get('/api/sendQ')
+                        .then(response => { 
+                        setResultA(JSON.stringify(response.data.choices[0].text).slice(5,-1).replace(/\\n/gi,'\n'))
+                         })
+                        .catch(error => console.log(error));
+                        setTransQ(LocalTransQ);
+                })
+                .catch(error => {console.log(error)});        
+            }}>
+            <p><Input required type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={transQ||''} onChange={
+                    event => {setTransQ(event.target.value);}} /></p>                
+            <p><Button variant='outlined' type="submit">ai에게 질문</Button></p>
+    </form>
+}
+
+function ResultForm() {
+    const [bindingQ, setBindingQ] = useFormState();
+    const [transQ, setTransQ] = useTransQState();
+    const [resultA, setResultA] = useResultAState();
+    return <div>{resultA}</div>
 }
 
 
 function App() {
-    const [bindingQ, setBindingQ] = useState(null);
-    const [transQ, setTransQ] = useState(null);
-    const [resultA, setResultA] = useState(null);
-    const [qArr, setQArr] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [transA, setTransA] = useState(null);
-
-    useEffect(() => {
-        axios.get('/apiTest')
-        .then(response => setQArr(response.data))               
-        .catch(error => console.log(error))
-    }, []);
-
-    useEffect(() => {
-        axios.get('/api/transQ')
-        .then(response => {setTransQ(JSON.stringify(response.data.message.result.translatedText).replace(/"/gi, ""));
-                            })
-        .catch(error => console.log(error))
-    }, [bindingQ]);
-
-    useEffect(() => {
-        setLoading(false);
-    }, [resultA]);
-
-    return (
+  return (
         <>
-        <ModProvider>
+        
             <Container>
+                <ModProvider>
                 <CustomDial></CustomDial><br/>
                     <QuestionAnswerIcon></QuestionAnswerIcon>
                     <Typography variant="h4" component="h2">gpt api를 이용한 프로그래밍 질문 웹서비스</Typography>
@@ -145,77 +226,9 @@ function App() {
                         <DialButton></DialButton>
                     </ButtonGroup><br/><br/>  
                 </Container>
-                <Container fixed> 
-                    <Container sx={{ border: 1, padding:2, borderColor: 'divider' }}>
-                    <Grid Container>
-                        <Grid item xs={2}>   
-                        질문 입력<br/>    
-                        <FormProvider><Form onForm={(_originQ) => {setBindingQ(_originQ);}}></Form></FormProvider>
-                        </Grid>
-                        <Grid item xs={10}> 
-                        추천 질문<br/><br/> 
-                        <ButtonGroup variant="outlined" aria-label="outlined button group">
-                        <ButtonForm qArr={qArr} postQ={(Q) => {setBindingQ(Q)}}></ButtonForm>
-                        </ButtonGroup></Grid>  
-                    </Grid>
-                    </Container>
-                    <br/>
-                    <Container sx={{ border: 1, padding:2, borderColor: 'divider' }}>     
-                    <br/>번역<br/>
-                    <form onSubmit={event => {
-                        const LocalTransQ = event.target.transQ.value;
-                            setLoading(true);
-                            event.preventDefault();
-                            axios.post('/request',
-                                {originQ: `${LocalTransQ}`})
-                                .then(function (response) {
-                                    
-                                    axios.get('/api/sendQ')
-                                        .then(response => { 
-                                        setResultA(JSON.stringify(response.data.choices[0].text).slice(5,-1).replace(/\\n/gi,'\n'))
-                                         })
-                                        .catch(error => console.log(error));
-                                        setTransQ(LocalTransQ);
-                                })
-                                .catch(error => {console.log(error)});        
-                            }}>
-                            <p><Input required type="text" name="transQ" placeholder='영어로 직접 입력 가능' value={transQ||''} onChange={
-                                    event => {setTransQ(event.target.value);}} /></p>                
-                            <p><Button variant='outlined' type="submit">ai에게 질문</Button></p>
-                    </form>
-                    </Container>
-                    <br/>
-                    <Container sx={{ border: 1, padding:2, borderColor: 'divider' }}>    
-                    <br/>답변<br/><br/> 
-                      <form onSubmit={event => {
-                            event.preventDefault();
-                            const result = event.target.resultA.value;
-                            axios.post('/request', 
-                                        {originQ: `${result}`})
-                                      .then(function (response) {
-                                        console.log(response);
-                                        axios.get('/api/transQ')
-                                        .then(response => 
-                                            setTransA(JSON.stringify(response.data.message.result.translatedText).replace(/"/gi, "")))
-                                        .catch(error => console.log(error));   
-                                      })
-                                      .catch(function (error) {
-                                        console.log(error);})
-                             }
-
-                      }>
-                        <Input type="text" name="resultA" fullWidth multiline value={resultA||''} onChange={event => {setResultA(event.target.value);}}>{resultA}</Input>
-                        <p><Button variant="outlined" type="submit">번역</Button></p>
-                      </form> 
-                        <br/> <br/>답변 번역<br/><br/> 
-                    <Input type="text" fullWidth multiline value={transA||''} onChange={event => {
-                                 setTransA(event.target.value)
-                    }}></Input>
-                    </Container>    
-                </Container>
+                <Box></Box>
+                </ModProvider>   
             </Container>
-        </ModProvider>
-        {loading && <Loading />}
         </>
         );
 }
