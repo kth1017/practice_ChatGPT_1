@@ -43,7 +43,7 @@
 
 21 [context 사용] App은 context사용시 배제되므로 리덕스 사용 전까진 보류   
 
-22 
+22 [context 사용] useContext(context)를 쓰려면 contextProvider가 컴포넌트에 사용되어야함. 안그러면 undefined됨
 
 
 

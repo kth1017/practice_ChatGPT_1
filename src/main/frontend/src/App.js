@@ -132,7 +132,6 @@ function App() {
         setLoading(false);
     }, [resultA]);
 
-
     return (
         <>
         <ModProvider>
