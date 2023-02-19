@@ -21,7 +21,10 @@ public class AxiosController {
 
     @GetMapping("/api/transQ")
     public String transQ() {
-        return pService.incoding(apiService.putQ());
+        String a = " ";
+        a = pService.incoding(apiService.putQ());
+        System.out.println(a);
+        return a;
     }
     
     @GetMapping("/api/sendQ")

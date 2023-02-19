@@ -99,7 +99,7 @@ function ButtonForm(props) {
                             });
                         props.postQ(`What is the ${qArr[i]}?`);
                         }}>{qArr[i]}</Button>);  
-                        console.log(result)     ;     
+                            
             }  
         return result; 
     } 
@@ -113,6 +113,7 @@ function App() {
     const [resultA, setResultA] = useState(null);
     const [qArr, setQArr] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [transA, setTransA] = useState(null);
 
     useEffect(() => {
         axios.get('/apiTest')
@@ -130,6 +131,7 @@ function App() {
     useEffect(() => {
         setLoading(false);
     }, [resultA]);
+
 
     return (
         <>
@@ -168,9 +170,11 @@ function App() {
                             axios.post('/request',
                                 {originQ: `${LocalTransQ}`})
                                 .then(function (response) {
-                                    console.log(response);
+                                    
                                     axios.get('/api/sendQ')
-                                        .then(response => setResultA(JSON.stringify(response.data.choices[0].text).slice(5,-1).replace(/\\n/gi,'\n')))
+                                        .then(response => { 
+                                        setResultA(JSON.stringify(response.data.choices[0].text).slice(5,-1).replace(/\\n/gi,'\n'))
+                                         })
                                         .catch(error => console.log(error));
                                         setTransQ(LocalTransQ);
                                 })
@@ -184,7 +188,30 @@ function App() {
                     <br/>
                     <Container sx={{ border: 1, padding:2, borderColor: 'divider' }}>    
                     <br/>답변<br/><br/> 
-                        <TextField fullWidth multiline value={resultA||''} onChange={event => {setResultA(event.target.value);}}>{resultA}</TextField>
+                      <form onSubmit={event => {
+                            event.preventDefault();
+                            const result = event.target.resultA.value;
+                            axios.post('/request', 
+                                        {originQ: `${result}`})
+                                      .then(function (response) {
+                                        console.log(response);
+                                        axios.get('/api/transQ')
+                                        .then(response => 
+                                            setTransA(JSON.stringify(response.data.message.result.translatedText).replace(/"/gi, "")))
+                                        .catch(error => console.log(error));   
+                                      })
+                                      .catch(function (error) {
+                                        console.log(error);})
+                             }
+
+                      }>
+                        <Input type="text" name="resultA" fullWidth multiline value={resultA||''} onChange={event => {setResultA(event.target.value);}}>{resultA}</Input>
+                        <p><Button variant="outlined" type="submit">번역</Button></p>
+                      </form> 
+                        <br/> <br/>답변 번역<br/><br/> 
+                    <Input type="text" fullWidth multiline value={transA||''} onChange={event => {
+                                 setTransA(event.target.value)
+                    }}></Input>
                     </Container>    
                 </Container>
             </Container>
