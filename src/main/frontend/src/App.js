@@ -52,7 +52,7 @@ function useModState() {
 
 const FormContext = React.createContext();
 function FormProvider({ children }) {
-      const formState = useState([null, null, null]);
+      const formState = useState([, , , ,false]);
       return <FormContext.Provider value={formState}>
              {children}
             </FormContext.Provider>;
@@ -75,9 +75,12 @@ function useFormState(putIndex) {
 
 
 function Box() {
-    console.log("box 렌더링 횟수");
+    
+    const [resultA, setResultA] = useFormState(2);
+    console.log("box 렌더링");
+
     return <>
-            <FormProvider>
+            
                 <Container sx={{ border: 1, padding: 2, borderColor: 'divider' }}>
                     질문 입력 <Form></Form>
                     추천 질문 <br />
@@ -88,8 +91,9 @@ function Box() {
                 </Container>
                 <Container sx={{ border: 1, padding: 2, borderColor: 'divider' }}>
                     답변 <ResultForm></ResultForm>
+                    답변 번역 <TransResultForm></TransResultForm>
                 </Container>
-            </FormProvider>
+            
         </>
 }
 
@@ -98,8 +102,7 @@ function Form(props) {
     const [bindingQ, setBindingQ] = useFormState(0);
     const [transQ, setTransQ] = useFormState(1);
     const [resultA, setResultA] = useFormState(2);
-    console.log("form 렌더링 횟수");
-    console.log(bindingQ, "bingdingQ");
+    console.log("form 렌더링");
     
     return <form onSubmit={event =>{
         event.preventDefault();
@@ -130,7 +133,7 @@ function ButtonForm(props) {
     const [transQ, setTransQ] = useFormState(1);
     const [resultA, setResultA] = useFormState(2);
     const [qArr, setQArr] = useState([]);
-    console.log("buttonform 렌더링 횟수");
+    console.log("buttonform 렌더링");
 
     useEffect(() => {
         axios.get('/apiTest')
@@ -164,10 +167,12 @@ function TransForm(props) {
     const [bindingQ, setBindingQ] = useFormState(0);
     const [transQ, setTransQ] = useFormState(1);
     const [resultA, setResultA] = useFormState(2);
-    console.log("transform 렌더링 횟수");
+
+    console.log("transform 렌더링");
     return <form onSubmit={event => {
         const LocalTransQ = event.target.transQ.value;
             event.preventDefault();
+
             axios.post('/request',
                 {originQ: `${LocalTransQ}`})
                 .then(function (response) {
@@ -191,12 +196,44 @@ function ResultForm() {
     const [bindingQ, setBindingQ] = useFormState(0);
     const [transQ, setTransQ] = useFormState(1);
     const [resultA, setResultA] = useFormState(2);
-    console.log("resultform 렌더링 횟수");
-    return <div>{resultA}</div>
+    const [transA, setTransA] = useFormState(3);
+
+    console.log("resultform 렌더링");
+    return <form onSubmit={event => {
+        event.preventDefault();
+        const result = event.target.resultA.value;
+        axios.post('/request', 
+                    {originQ: `${result}`})
+                  .then(function (response) {
+                    console.log(response);
+                    axios.get('/api/transQ')
+                    .then(response => 
+                        setTransA(JSON.stringify(response.data.message.result.translatedText).replace(/"/gi, "")))
+                    .catch(error => console.log(error));   
+                  })
+                  .catch(function (error) {
+                    console.log(error);})
+         }
+
+  }>
+    <Input type="text" name="resultA" fullWidth multiline value={resultA||''} onChange={event =>
+         {setResultA(event.target.value);
+         }}></Input>
+    <p><Button variant="outlined" type="submit">번역</Button></p>
+  </form> 
+}
+
+function TransResultForm() {
+    const [transA, setTransA] = useFormState(3);
+    return <TextField fullWidth multiline value={transA||''} onChange={event => {
+        setTransA(event.target.value)
+}}></TextField>
+    
 }
 
 
 function App() {
+    
   return (
         <>
         
@@ -211,7 +248,7 @@ function App() {
                         <DialButton></DialButton>
                     </ButtonGroup><br/><br/>  
                 </Container>
-                <Box></Box>
+                <FormProvider><Box></Box></FormProvider>
                 </ModProvider>   
             </Container>
         </>
