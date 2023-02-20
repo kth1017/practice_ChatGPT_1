@@ -45,6 +45,8 @@
 
 22 [context 사용] useContext(context)를 쓰려면 contextProvider가 컴포넌트에 사용되어야함. 안그러면 undefined됨
 
+23 [context 묶기] context를 묶을 때 배열을 잘 못 사용하면 비구조화 문법때문에 문자열이 출력될 수 있다.
+
 
 
 

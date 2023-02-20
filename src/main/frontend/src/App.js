@@ -52,53 +52,32 @@ function useModState() {
 
 const FormContext = React.createContext();
 function FormProvider({ children }) {
-      const formState = useState(["start1", "start2"]);
+      const formState = useState([null, null, null]);
       return <FormContext.Provider value={formState}>
              {children}
             </FormContext.Provider>;
     }
-function useFormState() {
+function useFormState(putIndex) {
       const value = useContext(FormContext);
       if (value === undefined) {
         throw new Error('error')
             
-        }   return value[0][0];
+        }   
+        const index = putIndex;
+        return [ value[0][index],
+          (newValue) => {
+            const newArray = [...value[0]];
+            newArray[index] = newValue;
+            value[1](newArray);
+          },
+        ];
     }
-
-const TransQContext = React.createContext();
-function TransQProvider({ children }) {
-        const TransQState = useState(null);
-        return <TransQContext.Provider value={TransQState}>
-                {children}
-            </TransQContext.Provider>;
-}
-function useTransQState() {
-        const value = useContext(TransQContext);
-        if (value === undefined) {
-        throw new Error('error')
-            
-        }   return value;
-}    
-
-const ResultAContext = React.createContext();
-function ResultAProvider({ children }) {
-        const ResultAState = useState(null);
-        return <ResultAContext.Provider value={ResultAState}>
-                {children}
-            </ResultAContext.Provider>;
-}
-function useResultAState() {
-        const value = useContext(ResultAContext);
-        if (value === undefined) {
-        throw new Error('error')
-            
-        }   return value;
-}  
 
 
 function Box() {
+    console.log("box 렌더링 횟수");
     return <>
-            <TransQProvider><ResultAProvider><FormProvider>
+            <FormProvider>
                 <Container sx={{ border: 1, padding: 2, borderColor: 'divider' }}>
                     질문 입력 <Form></Form>
                     추천 질문 <br />
@@ -110,15 +89,17 @@ function Box() {
                 <Container sx={{ border: 1, padding: 2, borderColor: 'divider' }}>
                     답변 <ResultForm></ResultForm>
                 </Container>
-            </FormProvider></ResultAProvider></TransQProvider>
+            </FormProvider>
         </>
 }
 
 
 function Form(props) {
-    const [bindingQ, setBindingQ] = useFormState();
-    const [transQ, setTransQ] = useTransQState();
-    const [resultA, setResultA] = useResultAState();
+    const [bindingQ, setBindingQ] = useFormState(0);
+    const [transQ, setTransQ] = useFormState(1);
+    const [resultA, setResultA] = useFormState(2);
+    console.log("form 렌더링 횟수");
+    console.log(bindingQ, "bingdingQ");
     
     return <form onSubmit={event =>{
         event.preventDefault();
@@ -127,13 +108,14 @@ function Form(props) {
                     {originQ: `${originQ}`})
                   .then(function (response) {
                     console.log(response);
-                  })
-                  .catch(function (error) {
-                    console.log(error);});
-        axios.get('/api/transQ')
+                    axios.get('/api/transQ')
                     .then(response => {setTransQ(JSON.stringify(response.data.message.result.translatedText).replace(/"/gi, ""));
                                         })
                     .catch(error => console.log(error))
+                  })
+                  .catch(function (error) {
+                    console.log(error);});
+        
 
 
         }}>
@@ -144,10 +126,11 @@ function Form(props) {
 } 
 
 function ButtonForm(props) {
-    const [bindingQ, setBindingQ] = useFormState();
-    const [transQ, setTransQ] = useTransQState();
-    const [resultA, setResultA] = useResultAState();
+    const [bindingQ, setBindingQ] = useFormState(0);
+    const [transQ, setTransQ] = useFormState(1);
+    const [resultA, setResultA] = useFormState(2);
     const [qArr, setQArr] = useState([]);
+    console.log("buttonform 렌더링 횟수");
 
     useEffect(() => {
         axios.get('/apiTest')
@@ -178,9 +161,10 @@ function ButtonForm(props) {
 }
 
 function TransForm(props) {
-    const [bindingQ, setBindingQ] = useFormState();
-    const [transQ, setTransQ] = useTransQState();
-    const [resultA, setResultA] = useResultAState();
+    const [bindingQ, setBindingQ] = useFormState(0);
+    const [transQ, setTransQ] = useFormState(1);
+    const [resultA, setResultA] = useFormState(2);
+    console.log("transform 렌더링 횟수");
     return <form onSubmit={event => {
         const LocalTransQ = event.target.transQ.value;
             event.preventDefault();
@@ -204,9 +188,10 @@ function TransForm(props) {
 }
 
 function ResultForm() {
-    const [bindingQ, setBindingQ] = useFormState();
-    const [transQ, setTransQ] = useTransQState();
-    const [resultA, setResultA] = useResultAState();
+    const [bindingQ, setBindingQ] = useFormState(0);
+    const [transQ, setTransQ] = useFormState(1);
+    const [resultA, setResultA] = useFormState(2);
+    console.log("resultform 렌더링 횟수");
     return <div>{resultA}</div>
 }
 
